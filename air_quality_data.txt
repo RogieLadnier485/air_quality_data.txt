@@ -1,0 +1,34 @@
+import os
+from github import Github
+
+# Замените значения ниже на свои собственные учетные данные GitHub
+github_username = "ВАШ_ЛОГИН"
+github_password = "ВАШ_ПАРОЛЬ"
+repository_name = "название_репозитория"
+file_name = "air_quality_data.txt"
+
+# Ввод данных о качестве воздуха
+date = input("Введите дату (ГГГГ-ММ-ДД): ")
+air_quality = input("Введите показатель качества воздуха: ")
+
+# Создание объекта GitHub и аутентификация
+g = Github(github_username, github_password)
+
+# Получение репозитория
+repo = g.get_user().get_repo(repository_name)
+
+# Создание или обновление файла с данными
+file_path = os.path.join(repo.full_name, file_name)
+contents = repo.get_contents(file_path)
+
+# Формирование содержимого файла
+data = f"Дата: {date}\nПоказатель качества воздуха: {air_quality}"
+
+# Если файл существует, обновите его
+if contents:
+    repo.update_file(file_path, f"Обновление данных о качестве воздуха на {date}", data, contents.sha)
+else:
+    # Если файла нет, создайте новый
+    repo.create_file(file_path, f"Добавление данных о качестве воздуха на {date}", data)
+
+print(f"Данные о качестве воздуха успешно сохранены в репозитории {repository_name} на GitHub.")
